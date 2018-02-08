@@ -14,11 +14,74 @@ ENV PYTHON_VERSION 3.6.4
 # if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
 ENV PYTHON_PIP_VERSION 9.0.1
 
-# moved runtime dependencies
-# added build essentials
-RUN apt-get update \
-    && apt-get install -y gcc make g++ build-essential git wget dpkg-dev tcl-dev tk-dev libssl-dev tcl tk openssl \
-    && set -ex\
+RUN set -ex \
+	&& apt-get update \
+	&& buildDeps=" \
+	    dpkg-dev \
+		libbz2-dev \
+		libc6-dev \
+		libcurl4-openssl-dev \
+		libdb-dev \
+		libevent-dev \
+		libffi-dev \
+		libgdbm-dev \
+		libgeoip-dev \
+		libglib2.0-dev \
+		libjpeg-dev \
+		libkrb5-dev \
+		liblzma-dev \
+		libmagickcore-dev \
+		libmagickwand-dev \
+		libncurses5-dev \
+		libncursesw5-dev \
+		libpng-dev \
+		libpq-dev \
+		libreadline-dev \
+		libsqlite3-dev \
+		libssl-dev \
+		libwebp-dev \
+		libxml2-dev \
+		libxslt-dev \
+		libyaml-dev \
+		zlib1g-dev \
+		dpkg-dev \
+		tcl-dev \
+		tk-dev \
+		$(command -v gpg > /dev/null || echo 'gnupg dirmngr') \
+	" \
+	&& apt-get install -y --no-install-recommends \
+		$buildDeps \
+		ca-certificates \
+		curl \
+		wget \
+		bzr \
+		git \
+		mercurial \
+		openssh-client \
+		subversion \
+		procps \
+		autoconf \
+		automake \
+		bzip2 \
+		file \
+		g++ \
+		gcc \
+		imagemagick \
+		libtool \
+		make \
+		patch \
+		xz-utils \
+		tcl \
+		tk \
+		# https://lists.debian.org/debian-devel-announce/2016/09/msg00000.html
+		$( \
+		# if we use just "apt-cache show" here, it returns zero because "Can't select versions from package 'libmysqlclient-dev' as it is purely virtual", hence the pipe to grep
+			if apt-cache show 'default-libmysqlclient-dev' 2>/dev/null | grep -q '^Version:'; then \
+				echo 'default-libmysqlclient-dev'; \
+			else \
+				echo 'libmysqlclient-dev'; \
+			fi \
+		) \
     && wget -O python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz" \
 	&& wget -O python.tar.xz.asc "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz.asc" \
 	&& export GNUPGHOME="$(mktemp -d)" \
@@ -56,9 +119,8 @@ RUN apt-get update \
 	&& ln -s python3 python \
 	&& ln -s python3-config python-config \
 	&& python --version \
-    && set -ex; \
 	\
-	wget -O get-pip.py 'https://bootstrap.pypa.io/get-pip.py'; \
+	&& wget -O get-pip.py 'https://bootstrap.pypa.io/get-pip.py'; \
 	\
 	python get-pip.py \
 		--disable-pip-version-check \
@@ -74,7 +136,7 @@ RUN apt-get update \
 			\( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
 		\) -exec rm -rf '{}' +; \
 	rm -f get-pip.py \
-    && apt-get purge -yqq gcc make g++ build-essential git dpkg-dev tcl-dev tk-dev libssl-dev \
+    && apt-get purge -yqq $buildDeps \
     && apt-get autoremove -yqq \
     && apt-get clean \
     && rm -Rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
