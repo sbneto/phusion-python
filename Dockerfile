@@ -9,7 +9,7 @@ ENV PATH="/usr/local/bin:$PATH" \
 	PYTHON_VERSION="3.6.5" \
 # moved this env up
 # if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
-	PYTHON_PIP_VERSION="9.0.1"
+	PYTHON_PIP_VERSION="10.0.1"
 
 RUN set -ex \
 	&& apt-get update \
