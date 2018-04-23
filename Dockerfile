@@ -98,6 +98,9 @@ RUN set -ex \
 		--with-system-expat \
 		--with-system-ffi \
 		--without-ensurepip \
+		# adding optimizations on top of regular python build
+		--with-lto \
+		--enable-optimizations \
 	&& make -j "$(nproc)" \
 	&& make install \
 	&& ldconfig \
