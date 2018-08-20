@@ -1,4 +1,4 @@
-FROM phusion/baseimage
+FROM phusion/baseimage:0.11
 
 # ensure local python is preferred over distribution python
 ENV PATH="/usr/local/bin:$PATH" \
@@ -6,10 +6,10 @@ ENV PATH="/usr/local/bin:$PATH" \
 # > At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3*, and that's not OK.
 	LANG="C.UTF-8" \
 	GPG_KEY="0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D" \
-	PYTHON_VERSION="3.6.5" \
+	PYTHON_VERSION="3.7.0" \
 # moved this env up
 # if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
-	PYTHON_PIP_VERSION="10.0.1"
+	PYTHON_PIP_VERSION="18.0"
 
 RUN set -ex \
 	&& apt-get update \
@@ -44,6 +44,7 @@ RUN set -ex \
 		dpkg-dev \
 		tcl-dev \
 		tk-dev \
+		uuid-dev \
 		$(command -v gpg > /dev/null || echo 'gnupg dirmngr') \
 	" \
 	&& apt-get install -y --no-install-recommends \
