@@ -12,4 +12,3 @@ As well as on the ubuntu xenial buildpack-deps releases:
 It puts it all together using `phusion/baseimage` as the base image, trying to keep it as tight as possible.
 
 - [`phusion/baseimage-docker`](https://github.com/phusion/baseimage-docker)
-
